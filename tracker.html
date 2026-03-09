@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Tracker – Portfolio Ops</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7fc;
+        }
+        .navbar {
+            background-color: #003366;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar span {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 25px;
+        }
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+        .user-info {
+            color: #ffcc00;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+        .tools-bar {
+            background-color: #e9ecef;
+            padding: 10px 30px;
+            display: flex;
+            gap: 25px;
+            border-bottom: 1px solid #ccc;
+        }
+        .tools-bar span {
+            font-weight: bold;
+            color: #003366;
+        }
+        .tools-bar a {
+            color: #0056b3;
+            text-decoration: none;
+        }
+        .container {
+            padding: 30px;
+        }
+        h2 {
+            color: #003366;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #003366;
+            color: white;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #e6f0fa;
+        }
+        .priority-high {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .priority-medium {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        .priority-low {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .footer {
+            background-color: #003366;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <span>📁 Portfolio Operations System</span>
+        <div>
+            <span class="user-info" id="userDisplay"></span>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="register.html">Document Register</a>
+            <a href="tracker.html">Task Tracker</a>
+            <a href="ai-workflow.html">AI Workflows</a>
+            <a href="#" onclick="logout()">Logout</a>
+        </div>
+    </div>
+
+    <div class="tools-bar">
+        <span>Connected Tools:</span>
+        <a href="#">GTA Global Connect</a>
+        <a href="#">Maximize for Life</a>
+        <a href="#">Monday</a>
+        <a href="#">Jonyo</a>
+    </div>
+
+    <div class="container">
+        <h2>✅ Portfolio Task Tracker</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Company</th>
+                    <th>Task</th>
+                    <th>Category</th>
+                    <th>Owner</th>
+                    <th>Deadline</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="taskTable">
+                <!-- Filled by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer">
+        Portfolio Document Control & Operations System – Demo
+    </div>
+
+    <script>
+        // Get username
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('user') || 'admin';
+        document.getElementById('userDisplay').innerHTML = '👤 ' + username;
+
+        // User permissions
+        const users = {
+            admin: { companies: ['GTA', 'VAT', 'BAT'] },
+            legal: { companies: ['GTA', 'VAT', 'BAT'] },
+            support: { companies: ['GTA', 'BAT'] }
+        };
+        const user = users[username] || users.admin;
+
+        // All tasks
+        const allTasks = [
+            { company: 'GTA', task: 'Annual Compliance Filing', category: 'Compliance', owner: 'Legal Team', deadline: '2026-06-30', priority: 'High', status: 'Pending' },
+            { company: 'GTA', task: 'Board Meeting Prep', category: 'Governance', owner: 'Executive', deadline: '2026-04-10', priority: 'Medium', status: 'In Progress' },
+            { company: 'VAT', task: 'Contract Renewal', category: 'Legal', owner: 'Ops Manager', deadline: '2026-04-15', priority: 'Medium', status: 'In Progress' },
+            { company: 'VAT', task: 'Update Shareholder Register', category: 'Corporate', owner: 'Legal Team', deadline: '2026-03-25', priority: 'Low', status: 'Not Started' },
+            { company: 'BAT', task: 'Q2 Investor Report', category: 'Reporting', owner: 'Finance', deadline: '2026-07-15', priority: 'High', status: 'Pending' },
+            { company: 'BAT', task: 'Support Ticket Review', category: 'Operations', owner: 'Support Team', deadline: '2026-03-30', priority: 'Medium', status: 'In Progress' },
+            { company: 'Portfolio', task: 'Update Document Register', category: 'Operations', owner: 'Ops Analyst', deadline: '2026-03-30', priority: 'Medium', status: 'In Progress' }
+        ];
+
+        // Filter tasks
+        const filteredTasks = allTasks.filter(task => 
+            user.companies.includes(task.company) || task.company === 'Portfolio'
+        );
+
+        // Display tasks
+        const tbody = document.getElementById('taskTable');
+        filteredTasks.forEach(task => {
+            const row = document.createElement('tr');
+            let priorityClass = '';
+            if (task.priority === 'High') priorityClass = 'priority-high';
+            else if (task.priority === 'Medium') priorityClass = 'priority-medium';
+            else if (task.priority === 'Low') priorityClass = 'priority-low';
+            
+            row.innerHTML = `
+                <td>${task.company}</td>
+                <td>${task.task}</td>
+                <td>${task.category}</td>
+                <td>${task.owner}</td>
+                <td>${task.deadline}</td>
+                <td class="${priorityClass}">${task.priority}</td>
+                <td>${task.status}</td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        function logout() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
