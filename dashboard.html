@@ -2,147 +2,228 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard – Portfolio Ops</title>
     <style>
-        body { font-family: Arial; margin: 0; padding: 0; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7fc;
+        }
         .navbar {
             background-color: #003366;
             color: white;
-            padding: 15px 20px;
+            padding: 15px 30px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+        }
+        .navbar span {
+            font-size: 1.2rem;
+            font-weight: bold;
         }
         .navbar a {
             color: white;
             text-decoration: none;
-            margin-left: 20px;
+            margin-left: 25px;
+        }
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+        .user-info {
+            color: #ffcc00;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+        .tools-bar {
+            background-color: #e9ecef;
+            padding: 10px 30px;
+            display: flex;
+            gap: 25px;
+            border-bottom: 1px solid #ccc;
+        }
+        .tools-bar span {
+            font-weight: bold;
+            color: #003366;
+        }
+        .tools-bar a {
+            color: #0056b3;
+            text-decoration: none;
         }
         .container {
             display: flex;
-            min-height: 500px;
+            min-height: calc(100vh - 130px);
         }
         .sidebar {
-            width: 250px;
+            width: 280px;
             background: white;
             border-right: 1px solid #ddd;
             padding: 20px;
         }
+        .sidebar h3 {
+            color: #003366;
+            border-bottom: 2px solid #003366;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
         .main {
             flex: 1;
-            padding: 20px;
+            padding: 25px;
+            background: #f9f9f9;
         }
         .folder-item, .file-item {
-            padding: 8px;
+            padding: 10px 12px;
+            margin: 4px 0;
             cursor: pointer;
+            border-radius: 4px;
+            background: white;
+            border: 1px solid #eee;
         }
-        .folder-item:before { content: "📁 "; }
-        .file-item:before { content: "📄 "; }
-        .breadcrumb { margin-bottom: 20px; }
-        .user-info {
-            color: #ffcc00;
-            margin-right: 20px;
+        .folder-item:hover, .file-item:hover {
+            background-color: #e6f0fa;
+            border-color: #0056b3;
+        }
+        .folder-item:before { content: "📁 "; font-size: 1.1rem; }
+        .file-item:before { content: "📄 "; font-size: 1.1rem; }
+        .breadcrumb {
+            margin-bottom: 25px;
+            font-size: 1.2rem;
+            color: #555;
+            background: white;
+            padding: 12px 18px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .footer {
+            background-color: #003366;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
     <div class="navbar">
-        <span>Portfolio Operations System</span>
+        <span>📁 Portfolio Operations System</span>
         <div>
             <span class="user-info" id="userDisplay"></span>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="register.html">Document Register</a>
+            <a href="tracker.html">Task Tracker</a>
+            <a href="ai-workflow.html">AI Workflows</a>
             <a href="#" onclick="logout()">Logout</a>
         </div>
     </div>
 
+    <div class="tools-bar">
+        <span>Connected Tools:</span>
+        <a href="#">GTA Global Connect</a>
+        <a href="#">Maximize for Life</a>
+        <a href="#">Monday</a>
+        <a href="#">Jonyo</a>
+    </div>
+
     <div class="container">
         <div class="sidebar" id="sidebar">
-            <h3>Folders</h3>
+            <h3>📂 Companies</h3>
+            <div id="companyList"></div>
         </div>
         <div class="main">
-            <div class="breadcrumb" id="breadcrumb">Home</div>
-            <div id="fileList"></div>
+            <div class="breadcrumb" id="breadcrumb">Select a company</div>
+            <div id="contentArea"></div>
         </div>
     </div>
 
+    <div class="footer">
+        Portfolio Document Control & Operations System – Demo
+    </div>
+
     <script>
-        // Get logged in user
+        // Get username from URL
         const urlParams = new URLSearchParams(window.location.search);
         const username = urlParams.get('user') || 'admin';
-        
-        // Show username
         document.getElementById('userDisplay').innerHTML = '👤 ' + username;
 
         // User permissions
         const users = {
-            admin: { companies: ['GTA', 'VAT', 'BAT'], folders: ['all'] },
-            legal: { companies: ['GTA', 'VAT', 'BAT'], folders: ['Contracts', 'Compliance', 'Corporate'] },
-            support: { companies: ['GTA', 'BAT'], folders: ['Operations', 'Contracts'] }
+            admin: { 
+                companies: ['GTA', 'VAT', 'BAT'],
+                folders: ['Corporate_Records', 'Contracts', 'Shareholder_Agreements', 'Compliance_Filings', 'Board_Documents', 'Investor_Documents', 'Operational_Documents']
+            },
+            legal: { 
+                companies: ['GTA', 'VAT', 'BAT'],
+                folders: ['Corporate_Records', 'Contracts', 'Shareholder_Agreements', 'Compliance_Filings', 'Board_Documents']
+            },
+            support: { 
+                companies: ['GTA', 'BAT'],
+                folders: ['Operational_Documents', 'Contracts']
+            }
         };
 
         const user = users[username] || users.admin;
-        
-        // Show companies based on user
-        const sidebar = document.getElementById('sidebar');
-        let companyList = '<h3>Companies</h3>';
-        
-        user.companies.forEach(company => {
-            companyList += `<div class="folder-item" onclick="showCompany('${company}')">${company}</div>`;
-        });
-        
-        sidebar.innerHTML = companyList;
+        let currentCompany = '';
+        let currentFolder = '';
 
-        function showCompany(company) {
+        // Display companies in sidebar
+        const companyList = document.getElementById('companyList');
+        user.companies.forEach(company => {
+            const div = document.createElement('div');
+            div.className = 'folder-item';
+            div.textContent = company;
+            div.onclick = () => showCompanyFolders(company);
+            companyList.appendChild(div);
+        });
+
+        function showCompanyFolders(company) {
+            currentCompany = company;
             document.getElementById('breadcrumb').innerHTML = company;
             
-            let folders = '';
-            if (username === 'admin') {
-                folders = `
-                    <div class="folder-item" onclick="showFiles('${company}', 'Corporate')">Corporate_Records</div>
-                    <div class="folder-item" onclick="showFiles('${company}', 'Contracts')">Contracts</div>
-                    <div class="folder-item" onclick="showFiles('${company}', 'Compliance')">Compliance</div>
-                    <div class="folder-item" onclick="showFiles('${company}', 'Operations')">Operations</div>
-                `;
-            } else if (username === 'legal') {
-                folders = `
-                    <div class="folder-item" onclick="showFiles('${company}', 'Corporate')">Corporate_Records</div>
-                    <div class="folder-item" onclick="showFiles('${company}', 'Contracts')">Contracts</div>
-                    <div class="folder-item" onclick="showFiles('${company}', 'Compliance')">Compliance</div>
-                `;
-            } else if (username === 'support') {
-                if (company === 'GTA' || company === 'BAT') {
-                    folders = `
-                        <div class="folder-item" onclick="showFiles('${company}', 'Operations')">Operations</div>
-                        <div class="folder-item" onclick="showFiles('${company}', 'Contracts')">Contracts</div>
-                    `;
-                }
-            }
+            let foldersHtml = '<h3>📁 Folders</h3>';
+            user.folders.forEach(folder => {
+                foldersHtml += `<div class="folder-item" onclick="showFiles('${company}', '${folder}')">${folder}</div>`;
+            });
             
-            document.getElementById('fileList').innerHTML = folders;
+            document.getElementById('contentArea').innerHTML = foldersHtml;
         }
 
         function showFiles(company, folder) {
+            currentFolder = folder;
             document.getElementById('breadcrumb').innerHTML = company + ' / ' + folder;
             
-            let files = '';
-            if (folder === 'Contracts') {
-                files = '<div class="file-item" onclick="openFile()">ServiceAgreement.pdf</div>';
-                files += '<div class="file-item" onclick="openFile()">NDA.pdf</div>';
-            } else if (folder === 'Compliance') {
-                files = '<div class="file-item" onclick="openFile()">TaxFiling.pdf</div>';
-            } else if (folder === 'Operations') {
-                files = '<div class="file-item" onclick="openFile()">Report.pdf</div>';
+            let filesHtml = '<h3>📄 Documents</h3>';
+            
+            // Sample files based on folder
+            if (folder.includes('Contract')) {
+                filesHtml += '<div class="file-item" onclick="openFile()">ServiceAgreement_v2.pdf</div>';
+                filesHtml += '<div class="file-item" onclick="openFile()">NDA_v1.pdf</div>';
+                filesHtml += '<div class="file-item" onclick="openFile()">MSA_v3.pdf</div>';
+            } else if (folder.includes('Compliance')) {
+                filesHtml += '<div class="file-item" onclick="openFile()">TaxFiling_2025.pdf</div>';
+                filesHtml += '<div class="file-item" onclick="openFile()">Regulatory_Submission.pdf</div>';
+            } else if (folder.includes('Operational')) {
+                filesHtml += '<div class="file-item" onclick="openFile()">Monthly_Report_March.pdf</div>';
+                filesHtml += '<div class="file-item" onclick="openFile()">Operational_Plan.pdf</div>';
+            } else if (folder.includes('Corporate')) {
+                filesHtml += '<div class="file-item" onclick="openFile()">Certificate_of_Incorporation.pdf</div>';
+            } else if (folder.includes('Shareholder')) {
+                filesHtml += '<div class="file-item" onclick="openFile()">Shareholder_Agreement_v2.pdf</div>';
+            } else if (folder.includes('Board')) {
+                filesHtml += '<div class="file-item" onclick="openFile()">Board_Minutes_March2026.pdf</div>';
             } else {
-                files = '<div class="file-item" onclick="openFile()">Document.pdf</div>';
+                filesHtml += '<div class="file-item" onclick="openFile()">Document.pdf</div>';
             }
             
-            document.getElementById('fileList').innerHTML = files;
+            document.getElementById('contentArea').innerHTML = filesHtml;
         }
 
         function openFile() {
-            let pwd = prompt('Enter password to open document:');
+            const pwd = prompt('Enter password to open document:');
             if (pwd === 'demo') {
-                alert('Access granted');
+                alert('✅ Access granted. Document would open here.');
             } else {
-                alert('Wrong password');
+                alert('❌ Incorrect password.');
             }
         }
 
