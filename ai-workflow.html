@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Workflows – Portfolio Ops</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7fc;
+        }
+        .navbar {
+            background-color: #003366;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar span {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 25px;
+        }
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+        .user-info {
+            color: #ffcc00;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+        .tools-bar {
+            background-color: #e9ecef;
+            padding: 10px 30px;
+            display: flex;
+            gap: 25px;
+            border-bottom: 1px solid #ccc;
+        }
+        .tools-bar span {
+            font-weight: bold;
+            color: #003366;
+        }
+        .tools-bar a {
+            color: #0056b3;
+            text-decoration: none;
+        }
+        .container {
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h2 {
+            color: #003366;
+            border-bottom: 3px solid #003366;
+            padding-bottom: 10px;
+        }
+        .ai-card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-left: 5px solid #0056b3;
+        }
+        .ai-card h3 {
+            color: #0056b3;
+            margin-top: 0;
+        }
+        .ai-card p {
+            line-height: 1.6;
+            color: #333;
+        }
+        .footer {
+            background-color: #003366;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <span>📁 Portfolio Operations System</span>
+        <div>
+            <span class="user-info" id="userDisplay"></span>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="register.html">Document Register</a>
+            <a href="tracker.html">Task Tracker</a>
+            <a href="ai-workflow.html">AI Workflows</a>
+            <a href="#" onclick="logout()">Logout</a>
+        </div>
+    </div>
+
+    <div class="tools-bar">
+        <span>Connected Tools:</span>
+        <a href="#">GTA Global Connect</a>
+        <a href="#">Maximize for Life</a>
+        <a href="#">Monday</a>
+        <a href="#">Jonyo</a>
+    </div>
+
+    <div class="container">
+        <h2>🤖 AI‑Enabled Workflows</h2>
+        
+        <div class="ai-card">
+            <h3>📄 Contract Summarisation</h3>
+            <p>AI automatically extracts key terms from lengthy agreements including renewal dates, termination clauses, and financial obligations. Reduces review time from hours to minutes.</p>
+        </div>
+
+        <div class="ai-card">
+            <h3>🔍 Clause Comparison</h3>
+            <p>AI highlights differences between versions of shareholder agreements, contracts, and legal documents. Ensures version control and identifies changes instantly.</p>
+        </div>
+
+        <div class="ai-card">
+            <h3>⏰ Automated Deadline Reminders</h3>
+            <p>AI monitors the Task Tracker and sends proactive alerts for upcoming compliance filings, contract renewals, and board meetings. Never miss a critical deadline.</p>
+        </div>
+
+        <div class="ai-card">
+            <h3>📂 Intelligent Document Classification</h3>
+            <p>AI suggests folder placement based on document content analysis. Automatically routes documents to correct company and category folders.</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        Portfolio Document Control & Operations System – Demo
+    </div>
+
+    <script>
+        // Get username
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('user') || 'admin';
+        document.getElementById('userDisplay').innerHTML = '👤 ' + username;
+
+        function logout() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
