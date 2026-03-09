@@ -5,43 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Task Tracker – Portfolio Ops</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f7fc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         .navbar {
-            background-color: #003366;
+            background: linear-gradient(135deg, #003366 0%, #004080 100%);
             color: white;
             padding: 15px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .navbar span {
-            font-size: 1.2rem;
+        .navbar-brand {
+            font-size: 1.4rem;
             font-weight: bold;
         }
-        .navbar a {
+        .navbar-menu {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+        .navbar-menu a {
             color: white;
             text-decoration: none;
-            margin-left: 25px;
+            padding: 5px 10px;
         }
-        .navbar a:hover {
-            text-decoration: underline;
+        .navbar-menu a:hover {
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 4px;
         }
         .user-info {
-            color: #ffcc00;
-            margin-right: 20px;
+            background-color: #ffcc00;
+            color: #003366;
+            padding: 6px 15px;
+            border-radius: 20px;
             font-weight: bold;
         }
         .tools-bar {
             background-color: #e9ecef;
-            padding: 10px 30px;
+            padding: 12px 30px;
             display: flex;
-            gap: 25px;
-            border-bottom: 1px solid #ccc;
+            gap: 30px;
+            border-bottom: 1px solid #dee2e6;
+            flex-wrap: wrap;
         }
         .tools-bar span {
             font-weight: bold;
@@ -53,62 +68,50 @@
         }
         .container {
             padding: 30px;
+            flex: 1;
         }
         h2 {
             color: #003366;
+            margin-bottom: 20px;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             background: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border-radius: 4px;
+            border-radius: 8px;
             overflow: hidden;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px 8px;
-            text-align: left;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         th {
             background-color: #003366;
             color: white;
-            font-weight: 600;
+            padding: 15px 10px;
+            text-align: left;
         }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #dee2e6;
         }
         tr:hover {
-            background-color: #e6f0fa;
+            background-color: #f8f9fa;
         }
-        .priority-high {
-            color: #dc3545;
-            font-weight: bold;
-        }
-        .priority-medium {
-            color: #ffc107;
-            font-weight: bold;
-        }
-        .priority-low {
-            color: #28a745;
-            font-weight: bold;
-        }
+        .priority-high { color: #dc3545; font-weight: bold; }
+        .priority-medium { color: #ffc107; font-weight: bold; }
+        .priority-low { color: #28a745; font-weight: bold; }
         .footer {
             background-color: #003366;
             color: white;
             text-align: center;
-            padding: 12px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
+            padding: 15px;
+            margin-top: auto;
         }
     </style>
 </head>
 <body>
     <div class="navbar">
-        <span>📁 Portfolio Operations System</span>
-        <div>
-            <span class="user-info" id="userDisplay"></span>
+        <div class="navbar-brand">📁 Portfolio Operations System</div>
+        <div class="navbar-menu">
+            <span class="user-info" id="userDisplay">👤 </span>
             <a href="dashboard.html">Dashboard</a>
             <a href="register.html">Document Register</a>
             <a href="tracker.html">Task Tracker</a>
@@ -139,9 +142,7 @@
                     <th>Status</th>
                 </tr>
             </thead>
-            <tbody id="taskTable">
-                <!-- Filled by JavaScript -->
-            </tbody>
+            <tbody id="taskTable"></tbody>
         </table>
     </div>
 
@@ -150,12 +151,10 @@
     </div>
 
     <script>
-        // Get username
         const urlParams = new URLSearchParams(window.location.search);
         const username = urlParams.get('user') || 'admin';
         document.getElementById('userDisplay').innerHTML = '👤 ' + username;
 
-        // User permissions
         const users = {
             admin: { companies: ['GTA', 'VAT', 'BAT'] },
             legal: { companies: ['GTA', 'VAT', 'BAT'] },
@@ -163,26 +162,20 @@
         };
         const user = users[username] || users.admin;
 
-        // All tasks
         const allTasks = [
             { company: 'GTA', task: 'Annual Compliance Filing', category: 'Compliance', owner: 'Legal Team', deadline: '2026-06-30', priority: 'High', status: 'Pending' },
             { company: 'GTA', task: 'Board Meeting Prep', category: 'Governance', owner: 'Executive', deadline: '2026-04-10', priority: 'Medium', status: 'In Progress' },
             { company: 'VAT', task: 'Contract Renewal', category: 'Legal', owner: 'Ops Manager', deadline: '2026-04-15', priority: 'Medium', status: 'In Progress' },
             { company: 'VAT', task: 'Update Shareholder Register', category: 'Corporate', owner: 'Legal Team', deadline: '2026-03-25', priority: 'Low', status: 'Not Started' },
             { company: 'BAT', task: 'Q2 Investor Report', category: 'Reporting', owner: 'Finance', deadline: '2026-07-15', priority: 'High', status: 'Pending' },
-            { company: 'BAT', task: 'Support Ticket Review', category: 'Operations', owner: 'Support Team', deadline: '2026-03-30', priority: 'Medium', status: 'In Progress' },
-            { company: 'Portfolio', task: 'Update Document Register', category: 'Operations', owner: 'Ops Analyst', deadline: '2026-03-30', priority: 'Medium', status: 'In Progress' }
+            { company: 'BAT', task: 'Support Ticket Review', category: 'Operations', owner: 'Support Team', deadline: '2026-03-30', priority: 'Medium', status: 'In Progress' }
         ];
 
-        // Filter tasks
-        const filteredTasks = allTasks.filter(task => 
-            user.companies.includes(task.company) || task.company === 'Portfolio'
-        );
-
-        // Display tasks
+        const filteredTasks = allTasks.filter(task => user.companies.includes(task.company));
         const tbody = document.getElementById('taskTable');
+        
         filteredTasks.forEach(task => {
-            const row = document.createElement('tr');
+            const row = tbody.insertRow();
             let priorityClass = '';
             if (task.priority === 'High') priorityClass = 'priority-high';
             else if (task.priority === 'Medium') priorityClass = 'priority-medium';
@@ -197,7 +190,6 @@
                 <td class="${priorityClass}">${task.priority}</td>
                 <td>${task.status}</td>
             `;
-            tbody.appendChild(row);
         });
 
         function logout() {
