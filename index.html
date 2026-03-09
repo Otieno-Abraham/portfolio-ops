@@ -22,12 +22,17 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             text-align: center;
         }
+        h2 {
+            color: #003366;
+            margin-bottom: 20px;
+        }
         input {
             width: 90%;
             padding: 12px;
             margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 4px;
+            font-size: 16px;
         }
         button {
             background-color: #0056b3;
@@ -37,6 +42,30 @@
             border-radius: 4px;
             cursor: pointer;
             width: 100%;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #003d82;
+        }
+        .user-list {
+            text-align: left;
+            margin-top: 25px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            font-size: 14px;
+            border-left: 4px solid #0056b3;
+        }
+        .user-list strong {
+            color: #003366;
+            font-size: 16px;
+        }
+        .user-list span {
+            color: #0056b3;
+            font-weight: bold;
+            display: inline-block;
+            width: 60px;
         }
     </style>
 </head>
@@ -45,15 +74,33 @@
         <h2>Portfolio Operations & Document Control</h2>
         <form id="loginForm">
             <input type="text" id="username" placeholder="Username" value="admin" required>
-            <input type="password" id="password" placeholder="Password" value="admin" required>
+            <input type="password" id="password" placeholder="Password" required>
             <button type="submit">Login</button>
         </form>
+        
+        <div class="user-list">
+            <strong>Demo Credentials:</strong><br><br>
+            <span>admin</span> / admin (Full access - all companies & folders)<br>
+            <span>legal</span> / legal (Legal team - legal folders only)<br>
+            <span>support</span> / support (Support team - GTA & BAT only)
+        </div>
     </div>
 
     <script>
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            window.location.href = 'dashboard.html';
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if ((username === 'admin' && password === 'admin') ||
+                (username === 'legal' && password === 'legal') ||
+                (username === 'support' && password === 'support')) {
+                
+                window.location.href = 'dashboard.html?user=' + username;
+            } else {
+                alert('Invalid username or password');
+            }
         });
     </script>
 </body>
