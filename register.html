@@ -5,43 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document Register – Portfolio Ops</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f7fc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         .navbar {
-            background-color: #003366;
+            background: linear-gradient(135deg, #003366 0%, #004080 100%);
             color: white;
             padding: 15px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .navbar span {
-            font-size: 1.2rem;
+        .navbar-brand {
+            font-size: 1.4rem;
             font-weight: bold;
         }
-        .navbar a {
+        .navbar-menu {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+        .navbar-menu a {
             color: white;
             text-decoration: none;
-            margin-left: 25px;
+            padding: 5px 10px;
         }
-        .navbar a:hover {
-            text-decoration: underline;
+        .navbar-menu a:hover {
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 4px;
         }
         .user-info {
-            color: #ffcc00;
-            margin-right: 20px;
+            background-color: #ffcc00;
+            color: #003366;
+            padding: 6px 15px;
+            border-radius: 20px;
             font-weight: bold;
         }
         .tools-bar {
             background-color: #e9ecef;
-            padding: 10px 30px;
+            padding: 12px 30px;
             display: flex;
-            gap: 25px;
-            border-bottom: 1px solid #ccc;
+            gap: 30px;
+            border-bottom: 1px solid #dee2e6;
+            flex-wrap: wrap;
         }
         .tools-bar span {
             font-weight: bold;
@@ -53,50 +68,47 @@
         }
         .container {
             padding: 30px;
+            flex: 1;
         }
         h2 {
             color: #003366;
+            margin-bottom: 20px;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             background: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border-radius: 4px;
+            border-radius: 8px;
             overflow: hidden;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px 8px;
-            text-align: left;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         th {
             background-color: #003366;
             color: white;
-            font-weight: 600;
+            padding: 15px 10px;
+            text-align: left;
         }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #dee2e6;
         }
         tr:hover {
-            background-color: #e6f0fa;
+            background-color: #f8f9fa;
         }
         .footer {
             background-color: #003366;
             color: white;
             text-align: center;
-            padding: 12px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
+            padding: 15px;
+            margin-top: auto;
         }
     </style>
 </head>
 <body>
     <div class="navbar">
-        <span>📁 Portfolio Operations System</span>
-        <div>
-            <span class="user-info" id="userDisplay"></span>
+        <div class="navbar-brand">📁 Portfolio Operations System</div>
+        <div class="navbar-menu">
+            <span class="user-info" id="userDisplay">👤 </span>
             <a href="dashboard.html">Dashboard</a>
             <a href="register.html">Document Register</a>
             <a href="tracker.html">Task Tracker</a>
@@ -127,9 +139,7 @@
                     <th>Status</th>
                 </tr>
             </thead>
-            <tbody id="documentTable">
-                <!-- Filled by JavaScript -->
-            </tbody>
+            <tbody id="documentTable"></tbody>
         </table>
     </div>
 
@@ -138,12 +148,10 @@
     </div>
 
     <script>
-        // Get username
         const urlParams = new URLSearchParams(window.location.search);
         const username = urlParams.get('user') || 'admin';
         document.getElementById('userDisplay').innerHTML = '👤 ' + username;
 
-        // User permissions
         const users = {
             admin: { companies: ['GTA', 'VAT', 'BAT'] },
             legal: { companies: ['GTA', 'VAT', 'BAT'] },
@@ -151,26 +159,20 @@
         };
         const user = users[username] || users.admin;
 
-        // All documents
         const allDocuments = [
             { company: 'GTA', name: 'Shareholder Agreement', type: 'Legal', version: 'v2', owner: 'Legal Team', updated: '2026-02-15', status: 'Active' },
             { company: 'GTA', name: 'Annual Compliance Filing', type: 'Compliance', version: 'v1', owner: 'Compliance', updated: '2025-12-10', status: 'Archived' },
             { company: 'VAT', name: 'Master Services Agreement', type: 'Contract', version: 'v3', owner: 'Ops Manager', updated: '2026-03-01', status: 'Active' },
             { company: 'VAT', name: 'Board Minutes – March 2026', type: 'Governance', version: 'v1', owner: 'Executive', updated: '2026-03-20', status: 'Draft' },
             { company: 'BAT', name: 'Tax Filing – Q1 2026', type: 'Compliance', version: 'v1', owner: 'Finance', updated: '2026-04-05', status: 'Active' },
-            { company: 'BAT', name: 'Support Contract', type: 'Contract', version: 'v2', owner: 'Support Team', updated: '2026-02-28', status: 'Active' },
-            { company: 'Portfolio', name: 'Document Naming Convention', type: 'Governance', version: 'v1', owner: 'Ops', updated: '2026-01-10', status: 'Active' }
+            { company: 'BAT', name: 'Support Contract', type: 'Contract', version: 'v2', owner: 'Support Team', updated: '2026-02-28', status: 'Active' }
         ];
 
-        // Filter documents
-        const filteredDocs = allDocuments.filter(doc => 
-            user.companies.includes(doc.company) || doc.company === 'Portfolio'
-        );
-
-        // Display documents
+        const filteredDocs = allDocuments.filter(doc => user.companies.includes(doc.company));
         const tbody = document.getElementById('documentTable');
+        
         filteredDocs.forEach(doc => {
-            const row = document.createElement('tr');
+            const row = tbody.insertRow();
             row.innerHTML = `
                 <td>${doc.company}</td>
                 <td>${doc.name}</td>
@@ -180,7 +182,6 @@
                 <td>${doc.updated}</td>
                 <td>${doc.status}</td>
             `;
-            tbody.appendChild(row);
         });
 
         function logout() {
