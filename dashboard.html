@@ -38,23 +38,24 @@
         .folder-item:before { content: "📁 "; }
         .file-item:before { content: "📄 "; }
         .breadcrumb { margin-bottom: 20px; }
+        .user-info {
+            color: #ffcc00;
+            margin-right: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="navbar">
         <span>Portfolio Operations System</span>
         <div>
-            <a href="dashboard.html">Dashboard</a>
+            <span class="user-info" id="userDisplay"></span>
             <a href="#" onclick="logout()">Logout</a>
         </div>
     </div>
 
     <div class="container">
-        <div class="sidebar">
+        <div class="sidebar" id="sidebar">
             <h3>Folders</h3>
-            <div class="folder-item" onclick="navigateTo('GTA')">GTA</div>
-            <div class="folder-item" onclick="navigateTo('VAT')">VAT</div>
-            <div class="folder-item" onclick="navigateTo('BAT')">BAT</div>
         </div>
         <div class="main">
             <div class="breadcrumb" id="breadcrumb">Home</div>
@@ -63,21 +64,81 @@
     </div>
 
     <script>
-        function navigateTo(folder) {
-            document.getElementById('breadcrumb').innerHTML = folder;
-            let files = '';
-            if (folder === 'GTA') {
-                files = '<div class="file-item" onclick="openFile()">Contract.pdf</div>';
-            } else if (folder === 'VAT') {
-                files = '<div class="file-item" onclick="openFile()">Agreement.pdf</div>';
-            } else if (folder === 'BAT') {
-                files = '<div class="file-item" onclick="openFile()">Report.pdf</div>';
+        // Get logged in user
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('user') || 'admin';
+        
+        // Show username
+        document.getElementById('userDisplay').innerHTML = '👤 ' + username;
+
+        // User permissions
+        const users = {
+            admin: { companies: ['GTA', 'VAT', 'BAT'], folders: ['all'] },
+            legal: { companies: ['GTA', 'VAT', 'BAT'], folders: ['Contracts', 'Compliance', 'Corporate'] },
+            support: { companies: ['GTA', 'BAT'], folders: ['Operations', 'Contracts'] }
+        };
+
+        const user = users[username] || users.admin;
+        
+        // Show companies based on user
+        const sidebar = document.getElementById('sidebar');
+        let companyList = '<h3>Companies</h3>';
+        
+        user.companies.forEach(company => {
+            companyList += `<div class="folder-item" onclick="showCompany('${company}')">${company}</div>`;
+        });
+        
+        sidebar.innerHTML = companyList;
+
+        function showCompany(company) {
+            document.getElementById('breadcrumb').innerHTML = company;
+            
+            let folders = '';
+            if (username === 'admin') {
+                folders = `
+                    <div class="folder-item" onclick="showFiles('${company}', 'Corporate')">Corporate_Records</div>
+                    <div class="folder-item" onclick="showFiles('${company}', 'Contracts')">Contracts</div>
+                    <div class="folder-item" onclick="showFiles('${company}', 'Compliance')">Compliance</div>
+                    <div class="folder-item" onclick="showFiles('${company}', 'Operations')">Operations</div>
+                `;
+            } else if (username === 'legal') {
+                folders = `
+                    <div class="folder-item" onclick="showFiles('${company}', 'Corporate')">Corporate_Records</div>
+                    <div class="folder-item" onclick="showFiles('${company}', 'Contracts')">Contracts</div>
+                    <div class="folder-item" onclick="showFiles('${company}', 'Compliance')">Compliance</div>
+                `;
+            } else if (username === 'support') {
+                if (company === 'GTA' || company === 'BAT') {
+                    folders = `
+                        <div class="folder-item" onclick="showFiles('${company}', 'Operations')">Operations</div>
+                        <div class="folder-item" onclick="showFiles('${company}', 'Contracts')">Contracts</div>
+                    `;
+                }
             }
+            
+            document.getElementById('fileList').innerHTML = folders;
+        }
+
+        function showFiles(company, folder) {
+            document.getElementById('breadcrumb').innerHTML = company + ' / ' + folder;
+            
+            let files = '';
+            if (folder === 'Contracts') {
+                files = '<div class="file-item" onclick="openFile()">ServiceAgreement.pdf</div>';
+                files += '<div class="file-item" onclick="openFile()">NDA.pdf</div>';
+            } else if (folder === 'Compliance') {
+                files = '<div class="file-item" onclick="openFile()">TaxFiling.pdf</div>';
+            } else if (folder === 'Operations') {
+                files = '<div class="file-item" onclick="openFile()">Report.pdf</div>';
+            } else {
+                files = '<div class="file-item" onclick="openFile()">Document.pdf</div>';
+            }
+            
             document.getElementById('fileList').innerHTML = files;
         }
 
         function openFile() {
-            let pwd = prompt('Enter password:');
+            let pwd = prompt('Enter password to open document:');
             if (pwd === 'demo') {
                 alert('Access granted');
             } else {
